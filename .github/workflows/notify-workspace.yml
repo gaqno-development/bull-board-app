@@ -1,0 +1,26 @@
+name: Notify workspace on merge
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  notify-workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch submodule-updated to workspace
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.WORKSPACE_PAT }}
+          repository: gaqno-development/gaqno-development-workspace
+          event-type: submodule-updated
+          client-payload: |
+            {
+              "submodule": "bull-board-app",
+              "commit": "${{ github.sha }}",
+              "repo": "${{ github.repository }}",
+              "ref": "${{ github.ref_name }}",
+              "actor": "${{ github.actor }}",
+              "run_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
